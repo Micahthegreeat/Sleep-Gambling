@@ -7,7 +7,7 @@ import java.net.InetSocketAddress;
 
 public class server {
     public static void main(String[] args) throws IOException {
-        int port = 7000;
+        int port = 8080;
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/test", new MyHandler());
         server.setExecutor(null); // Creates a default executor
