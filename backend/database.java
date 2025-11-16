@@ -76,6 +76,7 @@ public class database {
                 try{
                     constructionHelper(currCheckingUsername);
                 } catch(FileNotFoundException e) {
+                    System.out.println(currCheckingUsername);
                     s2.close();
                     throw new NoSuchElementException();
                 }
