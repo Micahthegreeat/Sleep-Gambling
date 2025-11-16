@@ -27,6 +27,8 @@ public class database {
 
     public String hash;
 
+    public ArrayList<String> friends;
+
     public database(String username) throws NoSuchElementException {
         try{
             constructionHelper(username);
@@ -108,6 +110,7 @@ public class database {
         if(needToUpdateBcWeek) {
             writeToFile();
         }
+        s.close();
     }
 
     private void writeToFile() {
@@ -178,5 +181,38 @@ public class database {
         }catch( Exception e){
             throw e;
         }
+    }
+
+    public String getJson() {
+        String returnable = "{\"" + username + "\" : \"<username>\", " +
+        "\"week\" : " + currWeek + ", " +
+        "\"points\" : " + points + " " + 
+        "\"bedtime\" : " + bedtime + ", " + 
+        "\"week\" : [" + weekSleep[0] + ", " + weekSleep[1] + ", " + weekSleep[2] + ", " + weekSleep[3] + ", " + weekSleep[4] + ", " + weekSleep[5] + ", " + weekSleep[6] + "], " +
+        "\"items\" : {";
+        for(int i = 0; i < items.size(); i ++) {
+            returnable += "\"" + items.get(i) + "\" :  " + itemCount.get(i);
+            if(i != items.size() - 1) {
+                returnable +=", ";
+            } 
+        }
+        returnable += "}, \"friends\" : [";
+
+        for(int i = 0; i < friends.size(); i ++) {
+            /*returnable += "\"" + items.get(i) + "\" :  " + itemCount.get(i);
+            if(i != items.size() - 1) {
+                returnable +=", ";
+            } */
+           returnable += "\"" + friends.get(i) + "\"";
+           if(i != items.size() - 1) {
+                returnable +=", ";
+            }
+        }
+        /*
+    },
+    "friends" : ["friendNum", "friendNum"]
+    }*/
+        returnable += "]}";
+        return returnable;
     }
 }
