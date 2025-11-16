@@ -26,7 +26,9 @@ public class database {
     public String salt;
 
     public String hash;
-
+    /*
+     * array list of their usernames
+     */
     public ArrayList<String> friends;
 
     public database(String username) throws NoSuchElementException {
@@ -50,6 +52,7 @@ public class database {
                 try{
                     constructionHelper(currCheckingUsername);
                 } catch(FileNotFoundException e) {
+                    s2.close();
                     throw new NoSuchElementException();
                 }
                 
@@ -66,10 +69,37 @@ public class database {
     private void constructionHelper(String username) throws FileNotFoundException{
         boolean needToUpdateBcWeek;
         this.username = username;
-        String filepath = "DatabaseSuper\\Database\\" + username; 
+
+
+
+
+        String currentDirectoryPath = System.getProperty("user.dir");
+        File currentDirectory = new File(currentDirectoryPath + "\\backend\\DatabaseSuper\\Database");
+
+        // Get all files and directories in the current directory
+        File[] files = currentDirectory.listFiles();
+
+        if (files != null) {
+            System.out.println("Files and directories in the current directory:");
+            for (File file : files) {
+                if (file.isFile()) {
+                    System.out.println("File: " + file.getName());
+                } else if (file.isDirectory()) {
+                    System.out.println("Directory: " + file.getName());
+                }
+            }
+        } else {
+            System.out.println("Could not list files in the current directory.");
+        }
+
+
+
+        
+        String filepath = "backend\\DatabaseSuper\\Database\\" + username + ".txt"; 
+        System.out.println(username + "\n" + filepath);
         File f = new File(filepath);
         Scanner s = new Scanner(f);
-        
+        System.out.println("124");
         //get salt and hash
         Scanner s2 = new Scanner(s.nextLine());
         salt = s2.next();
@@ -107,9 +137,17 @@ public class database {
             itemCount.add(s2.nextInt());
             s2.close();
         }
+
+        this.friends = new ArrayList<String>(); //TODO
+
+
         if(needToUpdateBcWeek) {
             writeToFile();
         }
+
+
+
+
         s.close();
     }
 
@@ -162,6 +200,11 @@ public class database {
         writeToFile();
     }
 
+    public void setPoints(int day, int points) {
+        this.points = points;
+        writeToFile();
+    }
+
     public static void addToken(long token, String username, long currTime) throws FileNotFoundException{
         ArrayList<String> tokenCurrent = new ArrayList<String>();
         File f = new File("DatabaseSuper\\tokens");
@@ -184,9 +227,9 @@ public class database {
     }
 
     public String getJson() {
-        String returnable = "{\"" + username + "\" : \"<username>\", " +
+        String returnable = "{\"username\" : \"" + username + "\", " +
         "\"week\" : " + currWeek + ", " +
-        "\"points\" : " + points + " " + 
+        "\"points\" : " + points + ", " + 
         "\"bedtime\" : " + bedtime + ", " + 
         "\"week\" : [" + weekSleep[0] + ", " + weekSleep[1] + ", " + weekSleep[2] + ", " + weekSleep[3] + ", " + weekSleep[4] + ", " + weekSleep[5] + ", " + weekSleep[6] + "], " +
         "\"items\" : {";
@@ -214,5 +257,9 @@ public class database {
     }*/
         returnable += "]}";
         return returnable;
+    }
+    public String getShortJson() {
+        return "{\"username\" : \"" + username + "\", " +
+        "\"points\" : " + points + "}";
     }
 }
