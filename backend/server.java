@@ -1,4 +1,4 @@
-//package backend;
+package backend;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -27,7 +27,8 @@ public class server {
         public void handle(HttpExchange t) throws IOException {
             Headers heads = t.getRequestHeaders();
             
-            // adds headers to allow for 2 servers to run on the same machine and talk to each other
+            // Adds headers to allow for 2 servers to run on the same machine and talk to each other
+            // Only neccessary for demonstration purposes, a real server wouldn't require this
             t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
             t.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
             t.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
@@ -38,13 +39,16 @@ public class server {
             } else if (heads.containsKey(username) && auth.checkUsername(heads.getFirst(username))) {
                 // Validate hash
                 // Send token
-                // Otherwise, send 401
-            } else {
-                t.sendResponseHeaders(401, t.getResponseBody().toString().length());
             }
-            //send response
+            
+            // We didn't have valid token or we didn't have matching valid username and hash
+            t.sendResponseHeaders(401, 0);
+            sendResponse(t, "");
+        }
+
+        private static void sendResponse(HttpExchange t, String response) throws IOException{
             OutputStream os = t.getResponseBody();
-            os.write(t.getResponseBody().toString().getBytes());
+            os.write(response.getBytes());
             os.close();
         }
     }
