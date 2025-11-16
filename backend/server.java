@@ -1,4 +1,4 @@
-package backend;
+//package backend;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -25,6 +25,11 @@ public class server {
         @Override
         public void handle(HttpExchange t) throws IOException {
             Headers heads = t.getRequestHeaders();
+            
+            // adds headers to allow for 2 servers to run on the same machine and talk to each other
+            t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+            t.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+            t.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
 
             // If token is there and valid, send data for requested page
             if (heads.containsKey(token) && auth.checkToken(Integer.parseInt(heads.getFirst(token)))) {
