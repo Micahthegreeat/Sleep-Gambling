@@ -44,7 +44,12 @@ public class auth {
         Instant now = Instant.now();
         Random rand = new Random();
         long token = Math.abs(rand.nextLong());
-        database.addToken(token, username, now.getEpochSecond());
+        try{
+            database.addToken(token, username, now.getEpochSecond());
+            return token;
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
     

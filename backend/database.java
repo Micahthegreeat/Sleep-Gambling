@@ -158,4 +158,25 @@ public class database {
         this.weekSleep[day] = sleepMinutes;
         writeToFile();
     }
+
+    public static void addToken(long token, String username, long currTime) throws FileNotFoundException{
+        ArrayList<String> tokenCurrent = new ArrayList<String>();
+        File f = new File("DatabaseSuper\\tokens");
+        Scanner s = new Scanner(f);
+        while(s.hasNextLine()) {
+            tokenCurrent.add(s.nextLine());
+        }
+        s.close();
+        try(PrintWriter p = new PrintWriter(f)){
+            for(int i = 0; i < tokenCurrent.size(); i ++) {
+                p.println(tokenCurrent.get(i));
+            }
+            String nextAddition = token + " " + username + " " + currTime;
+            p.println(nextAddition);
+            p.close();
+
+        }catch( Exception e){
+            throw e;
+        }
+    }
 }
