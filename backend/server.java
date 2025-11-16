@@ -12,6 +12,7 @@ public class server {
     private static final String username = "username";
     private static final String hash = "hash";
     private static final String pageRequest = "pagerequest";
+    private static final String friendsRequest = "friendsrequest";
 
     public static void main(String[] args) throws IOException {
         int port = 8080;
@@ -58,6 +59,13 @@ public class server {
             if (heads.containsKey(token) && auth.checkToken(Integer.parseInt(heads.getFirst(token)))) {
 
                 // TODO: Send data for requested page in body
+                if(!heads.containsKey(friendsRequest)){
+                    database d = new database(token);
+                    String returningJson = d.getJson();
+                    t.sendResponseHeaders(206, returningJson.length());
+                    sendResponse(t, returningJson);
+                    return;
+                }
 
             } else if (heads.containsKey(username) && auth.checkUsername(heads.getFirst(username))) {
                 if (heads.containsKey(hash)) {
