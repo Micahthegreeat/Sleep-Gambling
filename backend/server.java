@@ -87,13 +87,7 @@ public class server {
                 // TODO: Send data for requested page in body
                 if(!heads.containsKey(friendsRequest)){
 
-                    database d = null;
-                    try{
-                        d = new database(Long.parseLong(heads.getFirst(token)));
-                    } catch (Exception e) {
-                        System.out.println(e.toString());
-
-                    }
+                    database d = new database(Long.parseLong(heads.getFirst(token)));
 
                     //sendResponse(t, 200, "{\"test\": true}");
 
@@ -109,13 +103,7 @@ public class server {
                 }
 
                 // User wants friends
-                database d = null;
-                try{
-                    d = new database(Long.parseLong(heads.getFirst(token)));
-                } catch (Exception e) {
-                    System.out.println(e.toString());
-
-                }
+                database d = new database(heads.getFirst(friendsRequest));
 
                 //sendResponse(t, 200, "{\"test\": true}");
 
