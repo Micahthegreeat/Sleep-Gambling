@@ -3,8 +3,6 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -13,7 +11,6 @@ public class server {
     private static final String token = "token";
     private static final String username = "username";
     private static final String hash = "hash";
-    private static final String pageRequest = "pagerequest";
     private static final String friendsRequest = "friendsrequest";
 
     public static void main(String[] args) throws IOException {
@@ -45,10 +42,10 @@ public class server {
                 t.sendResponseHeaders(200, -1); // MUST be 200 OK
                 return;
             }
-            if (t.getRequestMethod().equals("GET")) {
+            if (t.getRequestMethod().equalsIgnoreCase("GET")) {
                 handleGetRequest(t, heads);
                 return;
-            } else if (t.getRequestMethod().equals("POST")) {
+            } else if (t.getRequestMethod().equalsIgnoreCase("POST")) {
                 handlePostRequest(t, heads);
                 return;
             }
@@ -110,6 +107,27 @@ public class server {
                     // sendResponse(t, returningJson);
                     return;
                 }
+
+                // User wants friends
+                database d = null;
+                try{
+                    d = new database(Long.parseLong(heads.getFirst(token)));
+                } catch (Exception e) {
+                    System.out.println(e.toString());
+
+                }
+
+                //sendResponse(t, 200, "{\"test\": true}");
+
+                String returningJson = d.getShortJson();
+                System.out.println(returningJson);
+
+                
+
+                sendResponse(t, 200, returningJson);
+                // t.sendResponseHeaders(206, returningJson.getBytes().length);
+                // sendResponse(t, returningJson);
+                return;
 
             } else if (heads.containsKey(username) && auth.checkUsername(heads.getFirst(username))) {
                 if (heads.containsKey(hash)) {
