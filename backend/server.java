@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
 public class server {
@@ -39,8 +40,12 @@ public class server {
                 // Send token
                 // Otherwise, send 401
             } else {
-                // Send 401
+                t.sendResponseHeaders(401, t.getResponseBody().toString().length());
             }
+            //send response
+            OutputStream os = t.getResponseBody();
+            os.write(t.getResponseBody().toString().getBytes());
+            os.close();
         }
     }
 }
