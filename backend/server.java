@@ -71,7 +71,7 @@ public class server {
                     }
 
                     // We have a valid username and hash, so send a token
-                    t.sendResponseHeaders(201, 0);
+                    t.sendResponseHeaders(201, String.valueOf(newToken).length());
                     sendResponse(t, String.valueOf(newToken));
                     return;
                 } else {
