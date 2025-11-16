@@ -60,10 +60,24 @@ public class server {
                 // TODO: Send data for requested page in body
 
             } else if (heads.containsKey(username) && auth.checkUsername(heads.getFirst(username))) {
-                if (heads.containsKey(hash) && auth.checkHash(heads.getFirst(hash))) {
+                if (heads.containsKey(hash)) {
+                    long newToken = auth.getToken(heads.getFirst(username), heads.getFirst(hash));
+
+                    // Username and hash do not match
+                    if (newToken == -1) {
+                        t.sendResponseHeaders(401, 0);
+                        sendResponse(t, "");
+                        return;
+                    }
+
                     // We have a valid username and hash, so send a token
                     t.sendResponseHeaders(201, 0);
-                    sendResponse(t, String.valueOf(auth.getToken(heads.getFirst(username))));
+                    sendResponse(t, String.valueOf(newToken));
+                    return;
+                } else {
+                    // Send a salt
+                    t.sendResponseHeaders(201, 0);
+                    sendResponse(t, auth.getSalt(heads.getFirst(username)));
                     return;
                 }
             }
