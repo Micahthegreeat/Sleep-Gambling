@@ -1,16 +1,22 @@
-package backend;
-import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpHandler;
+//package backend;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
 public class server {
+    private static final String token = "token";
+    private static final String username = "username";
+    private static final String hash = "hash";
+    private static final String pageRequest = "pagerequest";
+
     public static void main(String[] args) throws IOException {
         int port = 8080;
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-        server.createContext("/test", new MyHandler());
+        server.createContext("/index/", new MyHandler());
         server.setExecutor(null); // Creates a default executor
         server.start();
         System.out.println("HTTP Server started on port " + port);
@@ -19,10 +25,26 @@ public class server {
     static class MyHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
-            String response = "Hello from Java HTTP Server!";
-            t.sendResponseHeaders(200, response.length());
+            Headers heads = t.getRequestHeaders();
+            
+            // adds headers to allow for 2 servers to run on the same machine and talk to each other
+            t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+            t.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+            t.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
+
+            // If token is there and valid, send data for requested page
+            if (heads.containsKey(token) && auth.checkToken(Integer.parseInt(heads.getFirst(token)))) {
+                // Send data for requested page in body
+            } else if (heads.containsKey(username) && auth.checkUsername(heads.getFirst(username))) {
+                // Validate hash
+                // Send token
+                // Otherwise, send 401
+            } else {
+                t.sendResponseHeaders(401, t.getResponseBody().toString().length());
+            }
+            //send response
             OutputStream os = t.getResponseBody();
-            os.write(response.getBytes());
+            os.write(t.getResponseBody().toString().getBytes());
             os.close();
         }
     }
