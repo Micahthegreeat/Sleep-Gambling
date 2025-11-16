@@ -33,16 +33,17 @@ public class server {
             t.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
             t.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
 
-            // If token is there and valid, send data for requested page
-            if (heads.containsKey(token) && auth.checkToken(Integer.parseInt(heads.getFirst(token)))) {
-                // Send data for requested page in body
-            } else if (heads.containsKey(username) && auth.checkUsername(heads.getFirst(username))) {
-                // Validate hash
-                // Send token
+            // Determine method 
+            if (t.getRequestMethod().equals("GET")) {
+                handleGetRequest(t, heads);
+                return;
+            } else if (t.getRequestMethod().equals("POST")) {
+                handlePostRequest(t, heads);
+                return;
             }
             
-            // We didn't have valid token or we didn't have matching valid username and hash
-            t.sendResponseHeaders(401, 0);
+            // We had an invalid request method
+            t.sendResponseHeaders(400, 0);
             sendResponse(t, "");
         }
 
@@ -50,6 +51,40 @@ public class server {
             OutputStream os = t.getResponseBody();
             os.write(response.getBytes());
             os.close();
+        }
+
+        private void handleGetRequest(HttpExchange t, Headers heads) throws IOException{
+            // If token is there and valid, send data for requested page
+            if (heads.containsKey(token) && auth.checkToken(Integer.parseInt(heads.getFirst(token)))) {
+
+                // TODO: Send data for requested page in body
+
+            } else if (heads.containsKey(username) && auth.checkUsername(heads.getFirst(username))) {
+                if (heads.containsKey(hash) && auth.checkHash(heads.getFirst(hash))) {
+                    // We have a valid username and hash, so send a token
+                    t.sendResponseHeaders(201, 0);
+                    sendResponse(t, String.valueOf(auth.getToken(heads.getFirst(username))));
+                    return;
+                }
+            }
+            
+            // We didn't have valid token or we didn't have matching valid username and hash
+            t.sendResponseHeaders(401, 0);
+            sendResponse(t, "");
+        }
+
+        private void handlePostRequest(HttpExchange t, Headers heads) throws IOException{
+            if (!(heads.containsKey(token) && auth.checkToken(Integer.parseInt(heads.getFirst(token))))) {
+                // Send a 401, user needs to generate a token
+                t.sendResponseHeaders(401, 0);
+                sendResponse(t, "");
+                return;
+            }
+
+            // TODO: Put our data into the database somehow
+
+            t.sendResponseHeaders(200, 0);
+            sendResponse(t, "");
         }
     }
 }
