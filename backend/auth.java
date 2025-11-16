@@ -1,25 +1,50 @@
 package backend;
 
+import java.util.NoSuchElementException;
+import java.util.Random;
+import java.time.Instant;
+
 public class auth {
     public static boolean checkToken(long token){
-        return false;
+        try{
+            new database(token);
+            return true;
+        }catch(Exception e){
+            return false;
+        }
+        
     }
 
     public static boolean checkUsername(String username) {
-        return false;
-    }
-
-    public static boolean checkHash(String hash) {
-        return false;
+        try{
+            new database(username);
+            return true;
+        }catch(Exception e){
+            return false;
+        }
     }
 
     public static String getSalt(String username) {
-        return "";
+        try{
+            database d = new database(username);
+            return d.salt;
+        }catch(Exception e){
+            return null;
+        }
     }
 
     public static long getToken(String username, String hash) {
-        // We reserve -1 for a non matching username and hash
-        return -1;
+        database d;
+        try{
+            d = new database(username);
+        }catch(Exception e){
+            return -1;
+        }
+        d.hash.equals(hash);
+        Instant now = Instant.now();
+        Random rand = new Random();
+        long token = Math.abs(rand.nextLong());
+        database.addToken(token, username, now.getEpochSecond());
     }
 
     
