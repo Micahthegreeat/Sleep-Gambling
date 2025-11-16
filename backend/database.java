@@ -6,6 +6,7 @@ import java.util.Scanner;
 import java.time.Instant;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class database {
 
@@ -26,10 +27,32 @@ public class database {
     public String salt;
 
     public String hash;
+
+    public int streakNum;
     /*
      * array list of their usernames
      */
     public ArrayList<String> friends;
+
+    public database() {
+        currWeek = currWeek();
+        weekSleep = new int[7]; 
+        points = 0;
+        bedtime = 2200;
+        items = new ArrayList<String>();
+        itemCount = new ArrayList<Integer>();
+        username = "null";
+        Random r = new Random();
+        int saltSeed = Math.abs(r.nextInt());
+        char letter1 = (char) ((saltSeed % 26) + 65);
+        char letter2 = (char) ((saltSeed/ 26 % 26) + 65);
+        char letter3 = (char) ((saltSeed/ 26 / 26 % 26) + 65);
+        char letter4 = (char) ((saltSeed/ 26 / 26 / 26 % 26) + 65);
+        salt = letter1 + "" + letter2 + "" + letter3 + "" + letter4;
+        hash = "";
+        streakNum = 0;
+        friends = new ArrayList<String>();
+    }
 
     public database(String username) throws NoSuchElementException {
         try{
@@ -40,7 +63,7 @@ public class database {
     }
 
     public database(long token) throws NoSuchElementException, FileNotFoundException{
-        File f = new File("DatabaseSuper\\tokens");
+        File f = new File("backend\\DatabaseSuper\\tokens.txt");
         Scanner s = new Scanner(f);
         while (s.hasNextLine()) {
             Scanner s2 = new Scanner(s.nextLine());
@@ -72,9 +95,9 @@ public class database {
 
 
 
-
+        /*
         String currentDirectoryPath = System.getProperty("user.dir");
-        File currentDirectory = new File(currentDirectoryPath + "\\backend\\DatabaseSuper\\Database");
+        File currentDirectory = new File(currentDirectoryPath + "\\DatabaseSuper\\Database");
 
         // Get all files and directories in the current directory
         File[] files = currentDirectory.listFiles();
@@ -91,7 +114,7 @@ public class database {
         } else {
             System.out.println("Could not list files in the current directory.");
         }
-
+        */
 
 
         
@@ -106,15 +129,17 @@ public class database {
         hash = s2.next();
         s2.close();
 
-        //get week number and points
+        //get week number and points and streak
         s2 = new Scanner(s.nextLine());
-        needToUpdateBcWeek = s2.nextLong() == currWeek();
+        needToUpdateBcWeek = sameWeek(s2.nextLong());
         currWeek = currWeek();
         if (!needToUpdateBcWeek){
             points = s2.nextInt();
         } else {
+            s2.nextInt();
             points = 0;
         }
+        streakNum = s2.nextInt();
         s2.close();
 
         //get bedtime
@@ -151,16 +176,16 @@ public class database {
         s.close();
     }
 
-    private void writeToFile() {
+    public void writeToFile() {
         String toBeWritten = 
             salt + " " + hash + "\n" +
-            currWeek + " " + points + "\n" +
+            currWeek + " " + points + " " + streakNum + "\n" +
             bedtime + "\n" + 
             weekSleep[0] + " " + weekSleep[1] + " " + weekSleep[2] + " " + weekSleep[3] + " " + weekSleep[4] + " " + weekSleep[5] + " " + weekSleep[6] + " ";
         for(int i = 0; i < items.size(); i ++) {
             toBeWritten += "\n" + items.get(i) + " " + itemCount.get(i);
         }
-        File f = new File("DatabaseSuper\\Database\\" + username);
+        File f = new File("backend\\DatabaseSuper\\Database\\" + username + ".txt");
         try(PrintWriter p = new PrintWriter(f)){
             
             p.println(toBeWritten);
@@ -207,7 +232,7 @@ public class database {
 
     public static void addToken(long token, String username, long currTime) throws FileNotFoundException{
         ArrayList<String> tokenCurrent = new ArrayList<String>();
-        File f = new File("DatabaseSuper\\tokens");
+        File f = new File("backend\\DatabaseSuper\\tokens");
         Scanner s = new Scanner(f);
         while(s.hasNextLine()) {
             tokenCurrent.add(s.nextLine());
@@ -230,6 +255,7 @@ public class database {
         String returnable = "{\"username\" : \"" + username + "\", " +
         "\"week\" : " + currWeek + ", " +
         "\"points\" : " + points + ", " + 
+        "\"StreakNumber\" : " + streakNum + ", " + 
         "\"bedtime\" : " + bedtime + ", " + 
         "\"week\" : [" + weekSleep[0] + ", " + weekSleep[1] + ", " + weekSleep[2] + ", " + weekSleep[3] + ", " + weekSleep[4] + ", " + weekSleep[5] + ", " + weekSleep[6] + "], " +
         "\"items\" : {";
@@ -242,24 +268,16 @@ public class database {
         returnable += "}, \"friends\" : [";
 
         for(int i = 0; i < friends.size(); i ++) {
-            /*returnable += "\"" + items.get(i) + "\" :  " + itemCount.get(i);
-            if(i != items.size() - 1) {
-                returnable +=", ";
-            } */
            returnable += "\"" + friends.get(i) + "\"";
            if(i != items.size() - 1) {
                 returnable +=", ";
             }
         }
-        /*
-    },
-    "friends" : ["friendNum", "friendNum"]
-    }*/
         returnable += "]}";
         return returnable;
     }
     public String getShortJson() {
         return "{\"username\" : \"" + username + "\", " +
-        "\"points\" : " + points + "}";
+        "\"points\" : " + points + ", " + "\"StreakNumber\" : " + streakNum + "}";
     }
 }

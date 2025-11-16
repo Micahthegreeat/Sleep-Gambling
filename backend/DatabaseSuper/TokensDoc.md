@@ -14,7 +14,7 @@ name = username
 
 salt hash 
 
-weekNumberSince1970 amountofpoints
+weekNumberSince1970 amountofpoints StreakNumber
 
 sleepTimeGoal
 

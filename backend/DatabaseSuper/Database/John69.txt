@@ -1,5 +1,5 @@
-asdfsgn asdyfeh38hf73g8gh9u3hf9h
-2915 12
+ADFE asdyfeh38hf73g8gh9u3hf9h
+2915 0 2
 2200
-480 480 480 480 480 480 480 
+0 0 0 0 0 0 0 
 streakFreeze 1
