@@ -11,3 +11,11 @@ We used Figma to help generate our frontend, our frontend is ran with react, our
 ##### Intructions for Use:
 
 Download file from github, in a cmd window do cd filepath, run npm i, then do npm run dev. 
+
+
+
+##### Instructions to run server side:
+
+The server.java in the backend folder is the file to run that will open up the api server on localhost:8080
+
+to test api calls You can run the fetchTest.html in the backend folder and check the log, it ensures that the token you send is up to date.
