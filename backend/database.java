@@ -2,6 +2,7 @@ package backend;
 import java.util.NoSuchElementException;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 import java.time.Instant;
 import java.io.PrintWriter;
@@ -94,35 +95,10 @@ public class database {
         this.username = username;
 
 
-
-        /*
-        String currentDirectoryPath = System.getProperty("user.dir");
-        File currentDirectory = new File(currentDirectoryPath + "\\DatabaseSuper\\Database");
-
-        // Get all files and directories in the current directory
-        File[] files = currentDirectory.listFiles();
-
-        if (files != null) {
-            System.out.println("Files and directories in the current directory:");
-            for (File file : files) {
-                if (file.isFile()) {
-                    System.out.println("File: " + file.getName());
-                } else if (file.isDirectory()) {
-                    System.out.println("Directory: " + file.getName());
-                }
-            }
-        } else {
-            System.out.println("Could not list files in the current directory.");
-        }
-        */
-
-
         
-        String filepath = "backend\\DatabaseSuper\\Database\\" + username + ".txt"; 
-        System.out.println(username + "\n" + filepath);
+        String filepath = "backend\\DatabaseSuper\\Database\\" + username + ".txt";
         File f = new File(filepath);
         Scanner s = new Scanner(f);
-        System.out.println("124");
         //get salt and hash
         Scanner s2 = new Scanner(s.nextLine());
         salt = s2.next();
@@ -158,13 +134,19 @@ public class database {
         itemCount = new ArrayList<Integer>();
         while(s.hasNextLine()){
             s2 = new Scanner(s.nextLine());
-            items.add(s2.next());
+            String currChecking = s2.next();
+            if(currChecking.equals("friends")) break;
+            items.add(currChecking);
             itemCount.add(s2.nextInt());
             s2.close();
         }
 
-        this.friends = new ArrayList<String>(); //TODO
-
+        this.friends = new ArrayList<String>();
+        while(s.hasNextLine()){
+            s2 = new Scanner(s.nextLine());
+            friends.add(s2.next());
+            s2.close();
+        }
 
         if(needToUpdateBcWeek) {
             writeToFile();
@@ -185,7 +167,17 @@ public class database {
         for(int i = 0; i < items.size(); i ++) {
             toBeWritten += "\n" + items.get(i) + " " + itemCount.get(i);
         }
+        toBeWritten += "\nfriends";
+        for(int i = 0; i < friends.size(); i ++) {
+            toBeWritten += "\n" + friends.get(i);
+        }
         File f = new File("backend\\DatabaseSuper\\Database\\" + username + ".txt");
+        try {
+            f.createNewFile();
+        } catch (IOException e) {
+            System.out.println("Got an io Exception");
+        }
+        
         try(PrintWriter p = new PrintWriter(f)){
             
             p.println(toBeWritten);
@@ -269,7 +261,7 @@ public class database {
 
         for(int i = 0; i < friends.size(); i ++) {
            returnable += "\"" + friends.get(i) + "\"";
-           if(i != items.size() - 1) {
+           if(i != friends.size() - 1) {
                 returnable +=", ";
             }
         }
