@@ -183,9 +183,6 @@ public class server {
             } else {
                 sendResponse(t, 400, "");
             }
-
-            // TODO: Put our data into the database somehow
-
             sendResponse(t, 200, "");
         }
     }
