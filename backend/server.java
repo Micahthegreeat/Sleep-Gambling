@@ -6,12 +6,15 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.util.Scanner;
 
 public class server {
     private static final String token = "token";
     private static final String username = "username";
     private static final String hash = "hash";
     private static final String friendsRequest = "friendsrequest";
+    private static final String name = "name";
+    private static final String value = "value";
 
     public static void main(String[] args) throws IOException {
         int port = 8080;
@@ -147,6 +150,38 @@ public class server {
                 // Send a 401, user needs to generate a token
                 sendResponse(t, 401, "");
                 return;
+            }
+            if(heads.containsKey(name) && heads.containsKey(value)){
+                database d = new database(heads.getFirst(friendsRequest));
+                String s = heads.getFirst(name);
+                if(s.equals("bedtime")) {
+                    d.bedtime = Integer.parseInt(heads.getFirst(value));
+                } else if(s.equals("week")) {
+                    Scanner scan = new Scanner(heads.getFirst(value));
+                    d.weekSleep[scan.nextInt()] = scan.nextInt();
+                    scan.close();
+                }
+                else if(s.equals("item")) {
+                    String itemmodifying = heads.getFirst(value);
+                    if(d.items.contains(itemmodifying)) {
+                        d.itemCount.set((d.items.indexOf(itemmodifying)), d.itemCount.get((d.items.indexOf(itemmodifying))) + 1);
+                    } else {
+                        d.items.add(itemmodifying);
+                        d.itemCount.add(1);
+                    }
+                }
+                else if(s.equals("StreakNumber")) {
+                    d.streakNum = Integer.parseInt(heads.getFirst(value));
+                }
+                else if(s.equals("points")) {
+                    d.points = Integer.parseInt(heads.getFirst(value));
+                }
+                else if(s.equals("friends")) {
+                    d.friends.add(heads.getFirst(value));
+                }
+                sendResponse(t, 201, "");
+            } else {
+                sendResponse(t, 400, "");
             }
 
             // TODO: Put our data into the database somehow
